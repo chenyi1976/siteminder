@@ -1,4 +1,4 @@
-#APIs List
+# APIs List
 
 - POST /message  : send a email message to queue
 - GET /message   : get the queue status
@@ -8,7 +8,7 @@
 - POST /provider/sendgrid : request sendgrid adapter to send email
 - GET /provider/sendgrid: get sendgrid status
 
-#APIs Details
+# APIs Details
 
 ### Add Message To Queue
 
