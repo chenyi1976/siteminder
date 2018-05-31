@@ -1,26 +1,30 @@
+/**
+ * 
+ */
 package me.chenyi.sitemind.controller.provider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import me.chenyi.sitemind.pojo.BaseResponse;
 import me.chenyi.sitemind.pojo.MailMessage;
+import me.chenyi.sitemind.pojo.PojoDataResponse;
 import me.chenyi.sitemind.util.ResponseCodeConstant;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(MailgunController.class)
-public class MailgunControllerTest {
+@SpringBootTest
+@AutoConfigureMockMvc
+public class ProviderSendgridControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -32,7 +36,7 @@ public class MailgunControllerTest {
                 "sean.chen@innovit.com", "",
                 "", "Mock Mail Title", "Mock Mail Message");
         MockHttpServletRequestBuilder requestBuilder =
-                MockMvcRequestBuilders.post(MailgunController.URL_MAILGUN)
+                MockMvcRequestBuilders.post(ProviderSendgridController.URL_SENDGRID)
                         .param("from", mailMessage.getSender())
                         .param("to", mailMessage.getTo())
                         .param("cc", mailMessage.getCc())
@@ -40,16 +44,13 @@ public class MailgunControllerTest {
                         .param("title", mailMessage.getTitle())
                         .param("message", mailMessage.getMessage());
 
+        MockHttpServletResponse response = mvc.perform(requestBuilder).andExpect(status().isOk()).andReturn().getResponse();
 
-        //todo: mailgun has ssl problem, will fail below, can be fixed by adding certificate into system,
+        ObjectMapper objectMapper = new ObjectMapper();
+        PojoDataResponse jsonNode = objectMapper.readValue(response.getContentAsString(), PojoDataResponse.class);
 
-//        MockHttpServletResponse response = mvc.perform(requestBuilder).andDo(print()).andExpect(status().isOk()).andReturn().getResponse();
-//
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        BaseResponse baseResponse = objectMapper.readValue(response.getContentAsString(), BaseResponse.class);
-//
-//        Assert.assertNotNull(baseResponse);
-//        Assert.assertEquals(baseResponse.getReturnCode(), ResponseCodeConstant.SUCCESS.getCode());
+        Assert.assertNotNull(jsonNode);
+        Assert.assertEquals(jsonNode.getReturnCode(), ResponseCodeConstant.SUCCESS.getCode());
 
     }
 }

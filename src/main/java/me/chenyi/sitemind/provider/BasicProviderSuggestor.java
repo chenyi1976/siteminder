@@ -1,5 +1,6 @@
 package me.chenyi.sitemind.provider;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Collection;
@@ -10,9 +11,12 @@ public class BasicProviderSuggestor implements IProviderSuggestor {
     @Value( "${provider.retry_times:1}" )
     private int retry_times;
 
+    @Autowired
+    private IProviderHelper providerHelper;
+
     @Override
     public String suggestProvider(Collection<String> excludes) {
-        Map<String, String> allProviders = ProviderHelper.getAllProviders();
+        Map<String, String> allProviders = providerHelper.getAllProviders();
         for (String e : excludes) {
             allProviders.remove(e);
         }

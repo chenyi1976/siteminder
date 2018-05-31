@@ -20,13 +20,16 @@ public class EmailConsumer {
     @Autowired
     private HistoryRepository historyRepository;
 
+    @Autowired
+    private ProviderManager providerManager;
+
     @JmsListener(destination = "email.queue")
     public void receiveQueue(MailMessage mail) {
         if(logger.isDebugEnabled()){
             logger.debug("msgId = " + mail.getMsgId());
             logger.debug("msgText = " + mail.toString());
         }
-        Map<String, BaseResponse> activities = ProviderManager.sendMessage(mail);
+        Map<String, BaseResponse> activities = providerManager.sendMessage(mail);
 
         for (String providerId : activities.keySet()) {
             HistoryEntity entity = new HistoryEntity(mail, providerId, activities.get(providerId));

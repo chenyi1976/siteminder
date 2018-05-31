@@ -5,10 +5,10 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import me.chenyi.sitemind.pojo.BaseResponse;
-import me.chenyi.sitemind.pojo.PojoDataResponse;
 import me.chenyi.sitemind.pojo.MailMessage;
 import me.chenyi.sitemind.pojo.ResponseFactory;
-import me.chenyi.sitemind.util.ResponseCodeConstant;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -16,10 +16,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+@Component
 public class ProviderManager {
     private static Logger logger = Logger.getLogger(ProviderManager.class.getName());
 
-    public static Map<String, BaseResponse> sendMessage(MailMessage message){
+    @Autowired
+    private IProviderHelper providerHelper;
+
+    public Map<String, BaseResponse> sendMessage(MailMessage message){
 
         Map<String, BaseResponse> result = new LinkedHashMap<>();
 
@@ -37,7 +41,7 @@ public class ProviderManager {
 
             excludedProviders.add(providerId);
 
-            String providerUrl = ProviderHelper.getProviderUrl(providerId);
+            String providerUrl = providerHelper.getProviderUrl(providerId);
             if (providerUrl == null || "".equals(providerUrl))
                 continue;
 
@@ -56,7 +60,7 @@ public class ProviderManager {
 
                     return result;
                 } catch (UnirestException e) {
-                    logger.severe("Failed to send message via " + providerId);
+                    logger.severe("Failed to send message via " + providerUrl);
                     result.put(providerId, ResponseFactory.createErrorResponse("UnirestException: " + e.getMessage()));
                 }
             }

@@ -13,7 +13,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 @RestController
-public class MailgunController implements IProvider{
+public class ProviderMailgunController implements IProvider{
 
     public static final String ID_MAILGUN = "mailgun";
     public static final String URL_MAILGUN = "/provider/mailgun";

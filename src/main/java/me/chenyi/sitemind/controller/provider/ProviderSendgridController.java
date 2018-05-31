@@ -16,7 +16,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 @RestController
-public class SendgridController implements IProvider {
+public class ProviderSendgridController implements IProvider {
 
     public static final String ID_SENDGRID = "sendgrid";
 

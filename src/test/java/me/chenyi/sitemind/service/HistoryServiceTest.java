@@ -1,15 +1,12 @@
 package me.chenyi.sitemind.service;
 
-import me.chenyi.sitemind.controller.provider.MailgunController;
+import me.chenyi.sitemind.controller.provider.ProviderMailgunController;
 import me.chenyi.sitemind.entity.HistoryEntity;
 import me.chenyi.sitemind.entity.HistoryRepository;
 import me.chenyi.sitemind.pojo.BaseResponse;
 import me.chenyi.sitemind.pojo.MailMessage;
 import me.chenyi.sitemind.pojo.ResponseFactory;
-import me.chenyi.sitemind.util.ResponseCodeConstant;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -49,7 +46,7 @@ public class HistoryServiceTest {
 
         BaseResponse baseResponse = ResponseFactory.createSuccessfulResponse("some message");
 
-        Set<HistoryEntity> mockEntity = Collections.singleton(new HistoryEntity(mailMessage, MailgunController.ID_MAILGUN, baseResponse));
+        Set<HistoryEntity> mockEntity = Collections.singleton(new HistoryEntity(mailMessage, ProviderMailgunController.ID_MAILGUN, baseResponse));
         Mockito.when(historyRepository.findAll()).thenReturn(mockEntity);
 
 
@@ -58,6 +55,6 @@ public class HistoryServiceTest {
         Assert.assertEquals(allHistory.size(), 1);
 
         HistoryEntity next = allHistory.iterator().next();
-        Assert.assertEquals(next.getProvider(), MailgunController.ID_MAILGUN);
+        Assert.assertEquals(next.getProvider(), ProviderMailgunController.ID_MAILGUN);
     }
 }
