@@ -1,19 +1,21 @@
 package me.chenyi.sitemind.controller.provider;
 
-import me.chenyi.sitemind.pojo.BaseResponse;
-import me.chenyi.sitemind.pojo.PojoDataResponse;
-import me.chenyi.sitemind.pojo.ResponseFactory;
-import me.chenyi.sitemind.util.ResponseCodeConstant;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
-
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import me.chenyi.sitemind.pojo.BaseResponse;
+import me.chenyi.sitemind.pojo.ResponseFactory;
+import me.chenyi.sitemind.util.EmailAddressValidationUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class ProviderMailgunController implements IProvider{
+
+    private static final Logger logger = LoggerFactory.getLogger(ProviderMailgunController.class);
 
     public static final String ID_MAILGUN = "mailgun";
     public static final String URL_MAILGUN = "/provider/mailgun";
@@ -33,6 +35,20 @@ public class ProviderMailgunController implements IProvider{
                                  @RequestParam(value = "title") String title,
                                  @RequestParam(value = "message") String message) {
 
+        if (!EmailAddressValidationUtil.isValidEmailAddress(sender))
+            return ResponseFactory.createErrorResponse("Invalid Sender Email:" + sender);
+
+        if (!EmailAddressValidationUtil.isValidateEmailList(to))
+            return ResponseFactory.createErrorResponse("Invalid Receiver Email:" + to);
+
+        if (cc != null && !"".equals(cc))
+            if (!EmailAddressValidationUtil.isValidateEmailList(cc))
+                return ResponseFactory.createErrorResponse("Invalid cc:" + cc);
+
+        if (bcc != null && !"".equals(bcc))
+            if (!EmailAddressValidationUtil.isValidateEmailList(bcc))
+                return ResponseFactory.createErrorResponse("Invalid bcc:" + bcc);
+
         try {
             HttpResponse<JsonNode> request = Unirest.post("https://api.mailgun.net/v3/" + YOUR_DOMAIN_NAME + "/messages")
                     .basicAuth("api", API_KEY)
@@ -45,11 +61,13 @@ public class ProviderMailgunController implements IProvider{
                     .asJson();
             JsonNode body = request.getBody();
 
+            //todo: we should verify the body here,
+
             return ResponseFactory.createSuccessfulResponse(body);
         } catch (UnirestException e) {
-            e.printStackTrace();
-//            logger.log();
-            return ResponseFactory.createErrorResponse(e.toString());
+//            e.printStackTrace();
+            logger.error("Failed to send via mailgun: " + e.getStackTrace());
+            return ResponseFactory.createErrorResponse(e.getStackTrace());
         }
 
     }

@@ -3,6 +3,9 @@
 - POST /message  : send a email message to queue
 - GET /message   : get the queue status
 - POST /history  : get the email delivery history
+- GET /provider    : get all registered providers
+- POST /provider   : register provider
+- DELETE /provider : unregister provider
 - POST /provider/mailgun : request mailgun adapter to send email
 - GET /provider/mailgun  : get mailgun status
 - POST /provider/sendgrid : request sendgrid adapter to send email

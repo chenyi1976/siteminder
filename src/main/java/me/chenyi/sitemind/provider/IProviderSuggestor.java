@@ -4,7 +4,7 @@ import java.util.Collection;
 
 public interface IProviderSuggestor {
 
-    String suggestProvider(Collection<String> excludedSuggestor);
+    String suggestProvider(IProviderHelper providerHelper, Collection<String> excludedSuggestor);
 
     int retryTimes();
 }

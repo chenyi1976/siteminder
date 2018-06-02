@@ -28,7 +28,8 @@ public class ProviderController {
 
     @PostMapping(value = "/provider")
     @ResponseBody
-    public BaseResponse addProvider(String id, String url) {
+    public BaseResponse addProvider(@RequestParam(value = "provider_id") String id,
+                                    @RequestParam(value = "provider_url") String url) {
 
         //todo: verify url is correct, etc here
         providerHelper.registerProvider(id, url);
@@ -39,13 +40,13 @@ public class ProviderController {
 
     @DeleteMapping(value = "/provider")
     @ResponseBody
-    public BaseResponse deleteProvider(String id) {
+    public BaseResponse deleteProvider(@RequestParam(value = "provider_id") String id) {
 
         //todo: verify url is correct, etc here
         providerHelper.deregisterProvider(id);
 
         Map<String, String> allProviders = providerHelper.getAllProviders();
-        return ResponseFactory.createSuccessfulResponse("allProviders");
+        return ResponseFactory.createSuccessfulResponse(allProviders);
     }
 
 }

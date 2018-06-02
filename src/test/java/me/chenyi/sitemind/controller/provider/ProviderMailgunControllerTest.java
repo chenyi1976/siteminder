@@ -22,7 +22,7 @@ public class ProviderMailgunControllerTest {
     @Test
     public void sendMessage() throws Exception {
 
-        MailMessage mailMessage = new MailMessage("sean.chen@innovit.com",
+        MailMessage mailMessage = new MailMessage("noreply@sandboxa6325c42af244b0eb80c741e19c2bd46.mailgun.org",
                 "sean.chen@innovit.com", "",
                 "", "Mock Mail Title", "Mock Mail Message");
         MockHttpServletRequestBuilder requestBuilder =
@@ -35,7 +35,8 @@ public class ProviderMailgunControllerTest {
                         .param("message", mailMessage.getMessage());
 
 
-        //todo: mailgun has ssl problem, will fail below, can be fixed by adding certificate into system,
+        //todo: mailgun has ssl problem, will fail below, can be fixed by adding certificate file into system
+        //for now, just comment out the verification
 
 //        MockHttpServletResponse response = mvc.perform(requestBuilder).andDo(print()).andExpect(status().isOk()).andReturn().getResponse();
 //

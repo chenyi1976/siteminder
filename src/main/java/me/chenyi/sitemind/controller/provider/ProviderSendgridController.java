@@ -1,22 +1,22 @@
 package me.chenyi.sitemind.controller.provider;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
 import me.chenyi.sitemind.pojo.BaseResponse;
-import me.chenyi.sitemind.pojo.PojoDataResponse;
 import me.chenyi.sitemind.pojo.ResponseFactory;
-import me.chenyi.sitemind.util.ResponseCodeConstant;
-
+import me.chenyi.sitemind.util.EmailAddressValidationUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-
 @RestController
 public class ProviderSendgridController implements IProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProviderSendgridController.class);
 
     public static final String ID_SENDGRID = "sendgrid";
 
@@ -36,6 +36,21 @@ public class ProviderSendgridController implements IProvider {
                                  @RequestParam(value = "bcc", required = false) String bcc,
                                  @RequestParam(value = "title") String title,
                                  @RequestParam(value = "message") String message) {
+
+        if (!EmailAddressValidationUtil.isValidEmailAddress(sender))
+            return ResponseFactory.createErrorResponse("Invalid Sender Email:" + sender);
+
+        if (!EmailAddressValidationUtil.isValidateEmailList(to))
+            return ResponseFactory.createErrorResponse("Invalid Receiver Email:" + to);
+
+        if (cc != null && !"".equals(cc))
+            if (!EmailAddressValidationUtil.isValidateEmailList(cc))
+                return ResponseFactory.createErrorResponse("Invalid cc:" + cc);
+
+        if (bcc != null && !"".equals(bcc))
+            if (!EmailAddressValidationUtil.isValidateEmailList(bcc))
+                return ResponseFactory.createErrorResponse("Invalid bcc:" + bcc);
+
         HttpResponse<String> response = null;
         try {
             String requestStr = constructEmailMessage(sender, to, title,
@@ -51,8 +66,9 @@ public class ProviderSendgridController implements IProvider {
 
             return ResponseFactory.createSuccessfulResponse("Mail has been sent");
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseFactory.createErrorResponse(e.toString());
+//            e.printStackTrace();
+            logger.error("Failed to send via sendgrid: " + e.getStackTrace());
+            return ResponseFactory.createErrorResponse(e.getStackTrace());
         }
     }
 

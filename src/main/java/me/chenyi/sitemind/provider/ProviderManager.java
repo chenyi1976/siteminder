@@ -34,7 +34,7 @@ public class ProviderManager {
         Collection<String> excludedProviders = new HashSet<>();
 
         while(true){
-            String providerId = suggestor.suggestProvider(excludedProviders);
+            String providerId = suggestor.suggestProvider(providerHelper, excludedProviders);
 
             if (providerId == null || "".equals(providerId))
                 break;

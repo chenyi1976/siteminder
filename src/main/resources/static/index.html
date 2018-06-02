@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+    <title>Demo Page</title>
+</head>
+<body>
+
+<div class="container-fluid">
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <!-- Brand -->
+        <span class="navbar-brand"><i class="fas fa-home"></i> Demo by Yi Chen</span>
+
+        <!-- Links -->
+        <ul class="navbar-nav">
+            <!--<li class="nav-item">-->
+                <!--<a class="nav-link" href="#">List History</a>-->
+            <!--</li>-->
+            <!--<li class="nav-item">-->
+                <!--<a class="nav-link" href="#sendemail">Send Email</a>-->
+            <!--</li>-->
+            <!-- Dropdown -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                    Acurator
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" target="_blank" href="/actuator/health">Health</a>
+                    <a class="dropdown-item" target="_blank" href="/actuator/info">Info</a>
+                    <a class="dropdown-item" target="_blank" href="/actuator/mappings">Mappings</a>
+                    <a class="dropdown-item" target="_blank" href="/actuator/autoconfig">Auto Config</a>
+                    <a class="dropdown-item" target="_blank" href="/actuator/dump">Dump</a>
+                    <a class="dropdown-item" target="_blank" href="/actuator/env">Env</a>
+                    <a class="dropdown-item" target="_blank" href="/actuator/beans">Beans</a>
+                    <a class="dropdown-item" target="_blank" href="/actuator/configprops">Config Props</a>
+                    <a class="dropdown-item" target="_blank" href="/actuator/trace">Trace</a>
+                    <a class="dropdown-item" target="_blank" href="/actuator/metrics">Metrics</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <!--<div style="text-align: center;"><h2>Demo Page</h2></div>-->
+    <!--<div style="text-align: center;"><h1><i class="fab fa-accessible-icon"></i>Yi Chen<i class="fas fa-fighter-jet"></i></h1></div>-->
+
+
+    <div id="app">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#home">History</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#menu1">Send Email</a>
+            </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div class="tab-pane active container" id="home">
+
+                <h2>Show Message History</h2>
+
+                <button type="button" class="btn btn-primary" v-on:click="queryHistory">Query</button>
+
+                <div class="text-success">
+
+                {{ historyData }}
+
+                </div>
+
+            </div>
+            <div class="tab-pane container" id="menu1">
+                <form v-on:submit.prevent="sendEmail" id="messageForm">
+                    <h2>Send a Message to Email Service Adapter</h2>
+
+                    <div class="text-success">
+                        {{ messagePostData }}
+                    </div>
+                    <div class="form-group">
+                        <label for="from">From:</label>
+                        <input type="email" class="form-control" id="from" value="test@example.com"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="to">to:</label>
+                        <input type="email" class="form-control" id="to" value="test@example.com"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="cc">cc:</label>
+                        <input type="email" class="form-control" id="cc"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="bcc">bcc:</label>
+                        <input type="email" class="form-control" id="bcc"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Title:</label>
+                        <input type="text" class="form-control" id="subject" value="Title"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message:</label>
+                        <input type="text" class="form-control" id="message" value="Message"/>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal fade" role="dialog" id="loader-indicator">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body loader">
+                        Loading
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    (function () {
+        new Vue({
+            el: '#app',
+            data: {
+                messagePostData: '',
+                historyData: ''
+            },
+            methods: {
+                queryHistory: function () {
+                    var self = this;
+                    self.historyData = "loading";
+                    $.get("/history", function (data) {
+                        self.historyData = data;
+                    });
+                },
+                sendEmail : function () {
+                    var self = this;
+                    var from = $("#from").val();
+                    var to = $("#to").val();
+                    var cc = $("#cc").val();
+                    var bcc = $("#bcc").val();
+                    var subject = $("#subject").val();
+                    var message = $("#message").val();
+
+                    self.messagePostData = '';
+
+                    $.post("/message", {from: from, to: to, cc: cc, bcc: bcc, title: subject, message: message}, function (data) {
+                        self.messagePostData = data;
+                    });
+                }
+            }
+        });
+
+    })();
+</script>
+
+</body>
+</html>
