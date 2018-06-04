@@ -1,3 +1,7 @@
+# Refactoring
+
+The module is not clear for this repository, so I did some refactoring, and you can find code here: https://github.com/chenyi1976/sitemind_refactor
+
 # What it is
 
 This is a service that accepts the necessary information and sends emails.
